@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RPSheets.Services;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using RPSheets.Queries;
 
 namespace RPSheets.Controllers
 {
@@ -7,11 +8,26 @@ namespace RPSheets.Controllers
     [Route("/api/[controller]")]
     public class SheetsController: ControllerBase
     {
-        private readonly SheetsService _service;
+        private readonly IMediator _mediator;
 
-        public SheetsController(SheetsService service)
+        public SheetsController(IMediator mediator)
         {
-            _service = service;
+            _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var query = new GetAllSheetsQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get()
+        {
+            var query = new GetSheetQuery();
+            var result = await _mediator.Send(query);
         }
     }
 }

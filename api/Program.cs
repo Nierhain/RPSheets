@@ -25,15 +25,18 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.Authority = domain;
-    options.Audience = builder.Configuration["Auth0:Audience"];
+    options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}";
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    { 
+        ValidAudience = builder.Configuration["Auth0:Audience"],
+        ValidIssuer = $"{builder.Configuration["Auth0:Domain"]}"
+    };
 });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(Policies.Player, policy => policy.Requirements.Add(new HasScopeRequirement(Policies.Player, domain)));
-    options.AddPolicy(Policies.Gamemaster, policy => policy.Requirements.Add(new HasScopeRequirement(Policies.Gamemaster, domain)));
-    options.AddPolicy(Policies.Admin, policy => policy.Requirements.Add(new HasScopeRequirement(Policies.Admin, domain)));
+    options.AddPolicy(Policies.Player, policy => policy.RequireAuthenticatedUser().RequireClaim("scope", Policies.Player));
+    options.AddPolicy(Policies.Admin, policy => policy.RequireAuthenticatedUser().RequireClaim("scope", Policies.Admin));
 });
 
 builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();

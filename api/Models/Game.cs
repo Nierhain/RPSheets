@@ -6,8 +6,8 @@
         public string Name { get; set; } = default!;
 
         public User Gamemaster { get; set; } = default!;
-        public IEnumerable<User> Players { get; set; } = default!;
-        public IEnumerable<CharacterSheet> CharacterSheets { get; set; } = default!;
+        public List<User> Players { get; set; } = default!;
+        public List<CharacterSheet> CharacterSheets { get; set; } = default!;
 
     }
 }
